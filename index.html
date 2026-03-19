@@ -4,487 +4,253 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>SandFile</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🗂️%3C/text%3E%3C/svg%3E">
 <style>
   :root{
-    --surface:#ffffff;
-    --on-surface:#111827;
-    --muted:#6b7280;
-    --accent: #6750A4; /* fallback accent */
-    --card: #f8f8fb;
-    --glass: rgba(255,255,255,0.6);
-    --radius:12px;
-    --shadow: 0 6px 18px rgba(16,24,40,0.08);
-    --glass-shadow: 0 8px 30px rgba(99,102,241,0.08);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
+    --surface:#ffffff;--on-surface:#111827;--muted:#6b7280;--accent:#6750A4;--card:#f8f8fb;--radius:12px;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
-  /* Respect prefers-color-scheme only if user hasn't disabled dark mode via toggle.
-     We'll control theme via .dark on body (user can disable dark mode below). */
-  body{margin:0;background:linear-gradient(180deg,rgba(103,80,164,0.06),transparent 30%),var(--surface);color:var(--on-surface);min-height:100vh;display:flex;}
-  .app{
-    margin:auto;
-    width:100%;
-    max-width:1200px;
-    height:88vh;
-    display:grid;
-    grid-template-columns:320px 1fr 420px;
-    gap:18px;
-    padding:20px;
-  }
-
-  /* Header */
-  header{
-    position:fixed;
-    left:50%;
-    transform:translateX(-50%);
-    top:14px;
-    width:calc(100% - 40px);
-    max-width:1200px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    pointer-events:auto;
-  }
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{
-    background:linear-gradient(135deg,var(--accent),#43236b);
-    width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:22px;box-shadow:var(--glass-shadow);
-  }
-  .title{font-weight:700;font-size:18px;line-height:1}
-  .subtitle{font-size:12px;color:var(--muted)}
-
-  /* Controls */
-  .controls{display:flex;gap:8px;align-items:center}
-  .btn{
-    background:var(--card);border:0;padding:8px 12px;border-radius:10px;cursor:pointer;box-shadow:var(--shadow);display:inline-flex;gap:8px;align-items:center;font-weight:600;
-    transition:transform .12s ease, box-shadow .12s ease;
-  }
-  .btn:active{transform:translateY(1px)}
-  .inputfile{display:none}
-  .accent{background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 50%, white)); color:white}
-
-  /* Left pane - file tree */
-  .pane{
-    background:var(--glass);backdrop-filter: blur(6px);border-radius:var(--radius);padding:12px;box-shadow:var(--glass-shadow);overflow:auto;
-  }
-  .pane h3{margin:6px 4px;font-size:13px;color:var(--muted)}
-  .tree{list-style:none;padding-left:6px;margin:8px 0}
-  .tree li{padding:6px;border-radius:8px;display:flex;gap:8px;align-items:center;color:var(--on-surface);cursor:pointer;}
-  .tree li:hover{background:linear-gradient(90deg,rgba(103,80,164,0.06),transparent);}
-  .emoji{width:28px;text-align:center;font-size:18px}
-  .meta{font-weight:600;font-size:13px}
-  .sub{font-size:12px;color:var(--muted);margin-left:auto;padding-left:8px}
-
-  /* Center pane - preview & live view */
-  .center{
-    display:flex;flex-direction:column;gap:10px;
-  }
-  .preview{
-    background:var(--surface);border-radius:var(--radius);height:64vh;padding:12px;box-shadow:var(--shadow);overflow:auto;position:relative;
-    display:flex;flex-direction:column;
-  }
-  .preview header{display:flex;gap:8px;align-items:center}
-  .preview .view{flex:1;margin-top:12px;overflow:auto;border-radius:10px;border:1px solid rgba(0,0,0,0.04);position:relative}
-  .iframe-wrap{height:100%;width:100%;display:flex}
-  iframe{border:0;height:100%;width:100%;border-radius:8px}
-  pre{white-space:pre-wrap;padding:12px;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;color:#0f172a;background:linear-gradient(180deg,#fbfcfe,#f7f8fb);height:100%;box-sizing:border-box}
-  img.preview-img{max-width:100%;height:auto;display:block;margin:auto}
-  video,audio{width:100%;outline:none}
-  .file-actions{display:flex;gap:8px;margin-left:auto}
-  .badge{font-size:12px;padding:6px 8px;border-radius:999px;background:linear-gradient(90deg,var(--accent),#5b34a1);color:white}
-
-  /* Right pane - file details */
-  .right{
-    display:flex;flex-direction:column;gap:10px;
-  }
-  .panel{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow);overflow:auto}
-  .files-list{display:flex;flex-direction:column;gap:6px}
+  body{margin:0;background:linear-gradient(180deg,rgba(103,80,164,0.04),transparent),var(--surface);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;position:sticky;top:0;background:rgba(255,255,255,0.6);backdrop-filter:blur(6px);z-index:20;border-bottom:1px solid rgba(0,0,0,0.04)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#43236b);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+  main.app{display:grid;grid-template-columns:300px 1fr 320px;gap:16px;padding:18px;flex:1;align-items:start;max-width:1200px;margin:0 auto;width:100%}
+  .pane{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 20px rgba(16,24,40,0.06);overflow:auto;min-height:480px}
+  /* left */
+  .tree{list-style:none;padding:0;margin:8px 0}
+  .tree li{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;cursor:pointer}
+  .tree li:hover{background:rgba(103,80,164,0.04)}
+  .tree .folder>span.name{font-weight:600}
+  .indent{padding-left:18px}
+  /* center */
+  .preview{display:flex;flex-direction:column;height:100%}
+  .preview .header{display:flex;align-items:center;gap:12px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,0.04)}
+  .preview .header .actions{margin-left:auto;display:flex;gap:8px}
+  .view{flex:1;margin-top:12px;border-radius:10px;background:white;border:1px solid rgba(0,0,0,0.04);overflow:auto;display:flex;align-items:center;justify-content:center;padding:12px;min-height:360px}
+  .meta{font-size:13px;color:var(--muted)}
+  /* right */
+  .files-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
   .file-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px}
-  .file-item:hover{background:linear-gradient(90deg,rgba(103,80,164,0.04),transparent)}
-  .small{font-size:12px;color:var(--muted)}
-
-  /* Fullscreen */
-  .fs-btn{position:absolute;right:12px;top:12px;z-index:20}
-
-  /* animations */
-  .fade-in{animation:fadeIn .36s ease both}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-  /* Dark theme (toggleable) */
-  body.dark{
-    --surface:#0b1020;
-    --on-surface:#e6eef8;
-    --muted:#9aa6b2;
-    --card:#0f1724;
-    --glass:rgba(255,255,255,0.02);
-    --shadow: 0 10px 30px rgba(2,6,23,0.6);
-    background:linear-gradient(180deg, rgba(103,80,164,0.12), transparent 30%), #071026;
-  }
-
+  .file-item:hover{background:rgba(103,80,164,0.03);cursor:pointer}
+  /* buttons */
+  .btn{background:white;border:1px solid rgba(0,0,0,0.06);padding:8px 10px;border-radius:10px;cursor:pointer}
+  .btn.accent{background:linear-gradient(90deg,var(--accent),#5b34a1);color:white;border:0}
   /* small screens */
-  @media (max-width:980px){
-    .app{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;height:92vh;padding:12px}
-    header{top:8px}
-    .right{order:3}
-    .center{order:2}
+  @media(max-width:980px){
+    main.app{grid-template-columns:1fr;grid-template-rows:auto auto auto;padding:12px}
+    .pane{min-height:200px}
   }
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
-    <div class="logo" title="SandFile">SF</div>
+    <div class="logo">SF</div>
     <div>
-      <div class="title">SandFile</div>
-      <div class="subtitle">Preview projects locally — upload folder or .zip</div>
+      <div style="font-weight:700">SandFile</div>
+      <div style="font-size:12px;color:var(--muted)">Preview local project files — folder or zip</div>
     </div>
   </div>
 
-  <div class="controls">
-    <label class="btn">
-      📂 Open folder
-      <input id="dirPicker" class="inputfile" type="file" webkitdirectory directory multiple>
-    </label>
-
-    <label class="btn">
-      📦 Upload .zip
-      <input id="zipPicker" class="inputfile" type="file" accept=".zip,application/zip">
-    </label>
-
-    <button id="loadBtn" class="btn accent" title="Load selected file">Load</button>
-
-    <button id="toggleTheme" class="btn" title="Toggle dark mode">🌗</button>
-
-    <div style="width:8px"></div>
-
-    <div class="btn" id="accentPicker" title="Change accent color">
-      🎨 Accent
-      <input id="accentInput" type="color" style="border-radius:8px;margin-left:8px;border:0;background:transparent">
-    </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <label class="btn">📂 Open folder<input id="dirPicker" type="file" webkitdirectory directory multiple style="display:none"></label>
+    <label class="btn">📦 Upload .zip<input id="zipPicker" type="file" accept=".zip" style="display:none"></label>
+    <button id="loadBtn" class="btn accent">Load HTML</button>
+    <button id="toggleTheme" class="btn">🌗</button>
   </div>
 </header>
 
-<main class="app fade-in" role="application" aria-label="SandFile app">
-  <aside class="pane">
-    <h3>Project Files</h3>
-    <div class="small">Select a folder or drop a .zip to populate files</div>
+<main class="app" role="main">
+  <aside class="pane" id="leftPane">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:700">Project</div>
+      <div class="meta" id="projectName">No project</div>
+    </div>
+    <div style="height:12px"></div>
     <ul id="fileTree" class="tree" aria-live="polite"></ul>
+    <div class="meta" style="margin-top:12px">Tip: click a folder to expand/collapse. Click a file to preview.</div>
   </aside>
 
-  <section class="center">
-    <div class="preview" id="previewPane">
-      <header>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="badge" id="currentPath">No file loaded</div>
-          <div class="small" id="fileType">—</div>
-        </div>
-        <div class="file-actions" style="margin-left:auto">
-          <button id="openInNew" class="btn" title="Open preview in new window">↗️ New window</button>
-          <button id="fullScreen" class="btn fs-btn" title="Fullscreen preview">⤢ Fullscreen</button>
-        </div>
-      </header>
-
-      <div class="view" id="viewArea" tabindex="0" role="region" aria-label="Preview area">
-        <div style="padding:18px;color:var(--muted)">Load a file to preview. HTML files support live view (use 'Load').</div>
+  <section class="pane preview" id="centerPane">
+    <div class="header">
+      <div>
+        <div style="font-weight:700" id="currentFile">No file selected</div>
+        <div class="meta" id="currentFileMeta">—</div>
+      </div>
+      <div class="actions">
+        <button id="openNew" class="btn">↗ New window</button>
+        <button id="full" class="btn">⤢ Fullscreen</button>
+        <button id="downloadBtn" class="btn">⬇ Download</button>
       </div>
     </div>
 
-    <div class="panel" style="display:flex;gap:12px;align-items:center;justify-content:space-between">
-      <div>
-        <strong>Actions</strong>
-        <div class="small">Upload and interact with files in-browser</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button id="downloadBtn" class="btn" title="Download selected file">⬇️ Download</button>
-        <button id="revealBtn" class="btn" title="Reveal in tree">🔎 Reveal</button>
+    <div id="view" class="view">
+      <div style="text-align:center;color:var(--muted);max-width:420px">
+        <div style="font-weight:700;margin-bottom:6px">No preview</div>
+        <div class="meta">Upload a folder (Open folder) or drop files. Select an HTML file and click "Load HTML" to render it live.</div>
       </div>
     </div>
   </section>
 
-  <aside class="right">
-    <div class="panel">
-      <strong>Files</strong>
-      <div class="small">Click any item to preview</div>
-      <div id="filesList" class="files-list" style="margin-top:8px"></div>
-    </div>
-
-    <div class="panel">
-      <strong>Info</strong>
-      <div style="margin-top:8px">
-        <div class="small">App name: <strong>SandFile</strong></div>
-        <div class="small">Supports: HTML live view, text, images, video, audio, code highlighting, generic download</div>
-      </div>
-    </div>
+  <aside class="pane" id="rightPane">
+    <div style="font-weight:700">Files</div>
+    <div class="files-list" id="filesList"></div>
   </aside>
 </main>
 
 <script>
-/*
-  SandFile (single-file)
-  Features:
-   - Folder input via <input webkitdirectory> (works in Chromium/Edge/Firefox with differences).
-   - Zip upload parsed with a minimal JS unzip (using a simple JSZip-like routine embedded).
-   - File tree, emoji icons per type, preview for HTML (live), images, video, audio, text/code, generic download.
-   - Fullscreen preview, open in new window, accent color setting, dark mode toggle.
-   - No external network calls.
-*/
-
-/* Minimal zip handling using "fflate" inlined (small subset). To keep file single-file and license-free for example, we use a tiny unzipter:
-   However in production use, include a tested library like zip.js or fflate.
-   For the purposes of this demo, we'll attempt to use the browser's built-in ZIP support via fetch + Response.bundle? Not available.
-   So we'll feature a simple fallback: if JS unzip isn't available, show message to use folder upload or modern browser.
-*/
-
-// Utility
-const ext = (name)=> {
-  const m = name.split('.'); return m.length>1? m.pop().toLowerCase() : '';
-};
-
-const emojiFor = (name, isDir=false) => {
-  if(isDir) return "📁";
-  const e = ext(name);
-  if(["html","htm"].includes(e)) return "🌐";
-  if(["js","jsx","ts","tsx","py","rb","java","c","cpp","cs","rs","go","php","json","css","scss","md"].includes(e)) return "📄";
-  if(["png","jpg","jpeg","gif","webp","bmp","svg"].includes(e)) return "🖼️";
-  if(["mp4","webm","mov","ogg","mkv"].includes(e)) return "🎞️";
-  if(["mp3","wav","aac","ogg"].includes(e)) return "🎧";
-  if(["zip"].includes(e)) return "📦";
-  return "📄";
-};
-
-// State
-let entries = []; // {path, file, content (Blob|String), isDir}
-let current = null;
-let rootName = "project";
-let useDark = false;
-
-// Accent color: try to detect system accent via CSS color-scheme? No standardized API; allow user pick and attempt to read theme-color meta if present.
-const accentInput = document.getElementById('accentInput');
-const setAccent = (c)=>{
-  document.documentElement.style.setProperty('--accent', c);
-  document.querySelector('.logo').style.background = `linear-gradient(135deg, ${c}, color-mix(in srgb, ${c} 50%, #2b174a))`;
-};
-accentInput.addEventListener('input', (e)=> setAccent(e.target.value));
-
-// theme toggle
-const themeBtn = document.getElementById('toggleTheme');
-themeBtn.addEventListener('click', ()=> {
-  useDark = !useDark;
-  document.body.classList.toggle('dark', useDark);
-});
-
-// file inputs
+/* Simplified, improved UI behavior from prior version */
 const dirPicker = document.getElementById('dirPicker');
 const zipPicker = document.getElementById('zipPicker');
 const fileTree = document.getElementById('fileTree');
 const filesList = document.getElementById('filesList');
-const viewArea = document.getElementById('viewArea');
-const currentPathBadge = document.getElementById('currentPath');
-const fileTypeLabel = document.getElementById('fileType');
+const view = document.getElementById('view');
+const projectName = document.getElementById('projectName');
+const currentFileLabel = document.getElementById('currentFile');
+const currentFileMeta = document.getElementById('currentFileMeta');
 const loadBtn = document.getElementById('loadBtn');
 const downloadBtn = document.getElementById('downloadBtn');
-const revealBtn = document.getElementById('revealBtn');
-const openInNew = document.getElementById('openInNew');
-const fullScreenBtn = document.getElementById('fullScreen');
+const openNew = document.getElementById('openNew');
+const fullBtn = document.getElementById('full');
+const toggleTheme = document.getElementById('toggleTheme');
 
-dirPicker.addEventListener('change', async (ev)=>{
-  const files = Array.from(ev.target.files || []);
-  if(files.length===0) return;
-  rootName = "folder";
-  await ingestFiles(files);
+let entries = []; // {path, file}
+let current = null;
+
+// Helpers
+const ext = n=> (n.split('.').pop()||'').toLowerCase();
+const icon = (name,isDir)=> isDir ? '📁' : (['png','jpg','jpeg','gif','webp','svg'].includes(ext(name)) ? '🖼️' : (['html','htm'].includes(ext(name)) ? '🌐' : (['mp4','webm','mkv'].includes(ext(name)) ? '🎞️' : '📄')));
+
+dirPicker.addEventListener('change', async (e)=>{
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  projectName.textContent = 'Folder';
+  entries = files.map(f=>({path: f.webkitRelativePath || f.name, file: f}));
+  buildTree();
+  renderFilesList(entries);
 });
 
-zipPicker.addEventListener('change', async (ev)=>{
-  const f = ev.target.files[0];
-  if(!f) return;
-  rootName = f.name.replace(/\.zip$/i,'') || "zip_project";
-  // Try to unzip using JSZip if available (not included). As fallback, try browser's built-in unzip via FileReader + ZIP API is not available.
-  // For demo, if zip can't be handled, show error asking to upload expanded folder.
-  try{
-    const ztext = await f.arrayBuffer();
-    // Try using the native CompressionStream (not for zip). So show message.
-    alert("ZIP upload detected. Browser-side ZIP extraction isn't bundled in this demo. Please extract locally and use 'Open folder' or use a browser with built-in zip support.");
-  }catch(e){
-    console.error(e);
-  }
+zipPicker.addEventListener('change', ()=> {
+  alert('ZIP extraction not included in this build. Extract locally and use "Open folder".');
 });
 
-// Drop support
-document.addEventListener('dragover', (e)=>e.preventDefault());
-document.addEventListener('drop', async (e)=>{
+// drag & drop
+document.addEventListener('dragover', e=>e.preventDefault());
+document.addEventListener('drop', async e=>{
   e.preventDefault();
-  const items = e.dataTransfer.items;
-  if(!items) return;
-  const files = [];
-  for(const it of items){
-    if(it.kind==='file'){
-      const f = it.getAsFile();
-      if(f) files.push(f);
-    }
-  }
-  if(files.length) {
-    rootName = "dropped";
-    await ingestFiles(files);
+  const files = Array.from(e.dataTransfer.files || []);
+  if(files.length){
+    projectName.textContent = 'Dropped';
+    entries = files.map(f=>({path: f.name, file: f}));
+    buildTree();
+    renderFilesList(entries);
   }
 });
 
-// Ingest files (from directory input or drop)
-async function ingestFiles(fileList){
-  entries = [];
-  for(const f of fileList){
-    const path = f.webkitRelativePath || f.name;
-    entries.push({path, file: f, isDir:false});
-  }
-  // Build directories inferred
-  const dirs = new Set();
-  entries.forEach(e=> {
-    const parts = e.path.split('/');
-    parts.pop();
-    let cur='';
-    parts.forEach(p=>{
-      cur = cur? (cur+'/'+p):p;
-      if(cur) dirs.add(cur);
-    });
-  });
-  const dirEntries = Array.from(dirs).map(d=>({path:d,isDir:true}));
-  entries = [...dirEntries, ...entries].sort((a,b)=> a.path.localeCompare(b.path));
-  renderTree();
-  renderFilesList();
-}
-
-// Build tree UI
-function buildTreeModel(){
-  const root = {};
-  for(const e of entries){
-    const parts = e.path.split('/');
-    let node = root;
-    for(let i=0;i<parts.length;i++){
-      const p = parts[i]||"";
-      if(!node.children) node.children = {};
-      if(!node.children[p]) node.children[p] = {name:p, children:{}, entries:[]};
-      node = node.children[p];
-      if(i===parts.length-1){
-        node._entry = e;
-      }
-    }
-  }
-  return root;
-}
-
-function renderTree(){
+function buildTree(){
+  // clear
   fileTree.innerHTML = '';
-  const model = buildTreeModel();
-  // flatten to displayable list with indentation
-  const walk = (node, prefix='')=>{
-    if(!node.children) return;
-    const keys = Object.keys(node.children).sort();
-    for(const k of keys){
-      const n = node.children[k];
-      const full = prefix? `${prefix}/${k}`:k;
-      const isDir = !!n._entry ? n._entry.isDir : Object.keys(n.children||{}).length>0;
-      const li = document.createElement('li');
-      li.dataset.path = full;
-      li.innerHTML = `<span class="emoji">${emojiFor(k,isDir)}</span><span class="meta">${k}</span><span class="sub">${isDir ? 'folder' : ''}</span>`;
-      li.addEventListener('click', ()=> onSelectPath(full));
-      fileTree.appendChild(li);
-      // if this node is a file (has entry with a file)
-      if(n._entry && n._entry.file){
-        const fli = document.createElement('li');
-        fli.style.paddingLeft = '28px';
-        fli.dataset.path = full;
-        fli.innerHTML = `<span class="emoji">${emojiFor(n._entry.path)}</span><span class="meta">${k}</span><span class="sub">${(n._entry.file.size? (n._entry.file.size + ' bytes') : '')}</span>`;
-        fli.addEventListener('click', ()=> onSelectFile(n._entry));
-        fileTree.appendChild(fli);
+  // build a directory map
+  const map = {};
+  entries.forEach(en=>{
+    const parts = en.path.split('/');
+    let node = map;
+    for(let i=0;i<parts.length;i++){
+      const p = parts[i];
+      node[p] = node[p] || {__children: {}, __entry: null};
+      if(i===parts.length-1){
+        node[p].__entry = en;
       }
-      walk(n, full);
+      node = node[p].__children;
     }
-  };
-  walk({children:model});
-}
-
-// render files list (right pane)
-function renderFilesList(){
-  filesList.innerHTML = '';
-  entries.filter(e=>!e.isDir && e.file).sort((a,b)=>a.path.localeCompare(b.path)).forEach(e=>{
-    const div = document.createElement('div');
-    div.className = 'file-item';
-    div.innerHTML = `<div class="emoji">${emojiFor(e.path)}</div><div style="flex:1"><div class="meta">${e.path.split('/').pop()}</div><div class="small">${e.path}</div></div>`;
-    div.addEventListener('click', ()=> onSelectFile(e));
-    filesList.appendChild(div);
   });
-}
 
-// Selectors
-function onSelectPath(path){
-  currentPathBadge.textContent = path;
-  fileTypeLabel.textContent = 'Folder';
-  // Reveal subitems
-  // find entries that start with path + '/'
-  const items = entries.filter(en => en.path.startsWith(path + '/'));
-  filesList.innerHTML = '';
-  items.forEach(e=>{
-    const div = document.createElement('div');
-    div.className = 'file-item';
-    div.innerHTML = `<div class="emoji">${emojiFor(e.path,e.isDir)}</div><div style="flex:1"><div class="meta">${e.path.split('/').pop()}</div><div class="small">${e.isDir ? 'Folder' : e.file?.type || ''}</div></div>`;
-    div.addEventListener('click', ()=> onSelectFile(e));
-    filesList.appendChild(div);
-  });
-}
-
-async function onSelectFile(entry){
-  current = entry;
-  currentPathBadge.textContent = entry.path;
-  fileTypeLabel.textContent = entry.file ? (entry.file.type || ext(entry.path)) : '—';
-  // prepare preview
-  if(!entry.file) {
-    viewArea.innerHTML = `<div style="padding:18px;color:var(--muted)">No preview available</div>`;
-    return;
-  }
-  const mime = entry.file.type || '';
-  const eext = ext(entry.path);
-  if(['png','jpg','jpeg','gif','webp','svg','bmp'].includes(eext)){
-    const url = URL.createObjectURL(entry.file);
-    viewArea.innerHTML = `<img class="preview-img" src="${url}" alt="${entry.path}">`;
-  } else if(['mp4','webm','ogg','mov','mkv'].includes(eext)){
-    const url = URL.createObjectURL(entry.file);
-    viewArea.innerHTML = `<video controls src="${url}"></video>`;
-  } else if(['mp3','wav','ogg','flac','aac'].includes(eext)){
-    const url = URL.createObjectURL(entry.file);
-    viewArea.innerHTML = `<audio controls src="${url}"></audio>`;
-  } else if(['html','htm'].includes(eext)){
-    // show HTML source with option to Load live view
-    const text = await entry.file.text();
-    viewArea.innerHTML = `<div style="display:flex;height:100%;flex-direction:column"><div style="padding:12px;background:linear-gradient(90deg,#fbfbff,#fff)"><button id="liveLoad" class="btn">Load live HTML</button><button id="viewSrc" class="btn">View source</button></div><div style="flex:1;overflow:auto;padding:12px" id="htmlInner"><pre style="height:100%"></pre></div></div>`;
-    document.getElementById('viewSrc').addEventListener('click', ()=> {
-      const pre = document.querySelector('#htmlInner pre');
-      pre.textContent = text;
+  // recursive render
+  function renderNode(node, parentEl){
+    Object.keys(node).sort().forEach(key=>{
+      if(key==='__children' || key==='__entry') return;
+      const item = node[key];
+      const li = document.createElement('li');
+      const isDir = Object.keys(item.__children || {}).length > 0;
+      li.className = isDir ? 'folder' : '';
+      li.innerHTML = `<span style="width:26px">${icon(key,isDir)}</span><span class="name">${key}</span>`;
+      parentEl.appendChild(li);
+      if(isDir){
+        // expand/collapse
+        const sub = document.createElement('ul');
+        sub.className = 'indent';
+        sub.style.display = 'none';
+        li.appendChild(sub);
+        li.addEventListener('click', (ev)=>{
+          ev.stopPropagation();
+          sub.style.display = sub.style.display === 'none' ? 'block' : 'none';
+        });
+        renderNode(item.__children, sub);
+      }
+      if(item.__entry && item.__entry.file){
+        // file child
+        const fileLi = document.createElement('li');
+        fileLi.style.paddingLeft = '18px';
+        fileLi.innerHTML = `<span style="width:26px">${icon(item.__entry.path,false)}</span><span class="name">${key}</span>`;
+        fileLi.addEventListener('click', (ev)=>{ev.stopPropagation(); selectFile(item.__entry);});
+        parentEl.appendChild(fileLi);
+      }
     });
-    document.getElementById('liveLoad').addEventListener('click', ()=>{
-      // Create blob URL and allow relative assets by mapping other files as object URLs with a service worker-like approach is complex.
-      // We'll create an iframe with a blob URL. Relative asset linking may not work fully unless absolute URLs provided.
+  }
+  renderNode(map, fileTree);
+}
+
+function renderFilesList(list){
+  filesList.innerHTML = '';
+  list.sort((a,b)=>a.path.localeCompare(b.path)).forEach(en=>{
+    const el = document.createElement('div');
+    el.className = 'file-item';
+    el.innerHTML = `<div style="width:28px">${icon(en.path,false)}</div><div style="flex:1"><div style="font-weight:600">${en.path.split('/').pop()}</div><div class="meta" style="font-size:12px">${en.path}</div></div>`;
+    el.addEventListener('click', ()=> selectFile(en));
+    filesList.appendChild(el);
+  });
+}
+
+async function selectFile(entry){
+  current = entry;
+  currentFileLabel.textContent = entry.path.split('/').pop();
+  currentFileMeta.textContent = entry.file.type || `${Math.round(entry.file.size/1024)} KB`;
+  // preview small inline
+  const e = ext(entry.path);
+  if(['png','jpg','jpeg','gif','webp','svg'].includes(e)){
+    const url = URL.createObjectURL(entry.file);
+    view.innerHTML = `<img src="${url}" style="max-width:100%;height:auto">`;
+  } else if(['mp4','webm','ogg'].includes(e)){
+    const url = URL.createObjectURL(entry.file);
+    view.innerHTML = `<video controls src="${url}" style="max-width:100%"></video>`;
+  } else if(['html','htm'].includes(e)){
+    const text = await entry.file.text();
+    view.innerHTML = `<div style="width:100%"><div style="display:flex;gap:8px;margin-bottom:8px"><button id="previewLoad" class="btn accent">Load HTML</button><button id="viewSrc" class="btn">View source</button></div><div id="htmlBox" style="border:1px solid rgba(0,0,0,0.04);padding:8px;border-radius:8px;height:360px;overflow:auto"><pre style="white-space:pre-wrap;font-family:monospace">${escapeHtml(text)}</pre></div></div>`;
+    document.getElementById('previewLoad').addEventListener('click', ()=> {
       const blob = new Blob([text], {type:'text/html'});
       const url = URL.createObjectURL(blob);
-      viewArea.innerHTML = `<div class="iframe-wrap"><iframe src="${url}" sandbox="allow-same-origin allow-scripts allow-forms"></iframe></div>`;
+      // replace view with iframe
+      view.innerHTML = `<iframe src="${url}" style="width:100%;height:100%;min-height:420px;border:0;border-radius:8px"></iframe>`;
     });
-  } else if(['txt','md','json','css','js','py','java','c','cpp','h','rs','go','rb','toml','yaml','yml'].includes(eext) || mime.startsWith('text/')){
-    const text = await entry.file.text();
-    viewArea.innerHTML = `<pre>${escapeHtml(text)}</pre>`;
+    document.getElementById('viewSrc').addEventListener('click', ()=> {
+      const htmlBox = document.getElementById('htmlBox');
+      htmlBox.innerHTML = `<pre style="white-space:pre-wrap;font-family:monospace">${escapeHtml(text)}</pre>`;
+    });
   } else {
-    // generic binary: show basic info and download
-    viewArea.innerHTML = `<div style="padding:18px"><div class="meta">${entry.path.split('/').pop()}</div><div class="small">Type: ${mime || eext}</div><div style="height:12px"></div><button id="dlBtn" class="btn">Download</button></div>`;
-    document.getElementById('dlBtn').addEventListener('click', ()=> downloadCurrent());
+    // text or binary
+    if(entry.file.type.startsWith('text') || ['md','json','css','js','py','java','txt'].includes(e)){
+      const txt = await entry.file.text();
+      view.innerHTML = `<pre style="white-space:pre-wrap;font-family:monospace">${escapeHtml(txt)}</pre>`;
+    } else {
+      view.innerHTML = `<div style="text-align:center"><div style="font-weight:700">${entry.path.split('/').pop()}</div><div class="meta">${entry.file.type || e}</div><div style="height:8px"></div><button id="dl" class="btn">Download</button></div>`;
+      document.getElementById('dl').addEventListener('click', ()=> downloadCurrent());
+    }
   }
 }
 
-// escape helper
 function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// Download
 function downloadCurrent(){
-  if(!current || !current.file) return;
+  if(!current) return;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(current.file);
   a.download = current.path.split('/').pop();
@@ -492,15 +258,18 @@ function downloadCurrent(){
 }
 downloadBtn.addEventListener('click', downloadCurrent);
 
-// Reveal in tree
-revealBtn.addEventListener('click', ()=>{
-  if(!current) return;
-  alert('Reveal feature focuses the tree; in this single-file demo please manually look for: ' + current.path);
+// Load HTML button in header: if currently selected HTML, load it in preview (same as preview Load)
+loadBtn.addEventListener('click', ()=>{
+  if(!current){ alert('Select an HTML file first.'); return; }
+  if(!['html','htm'].includes(ext(current.path))){ alert('Selected file is not HTML. Select an .html file and click Load HTML.'); return; }
+  // emulate click of the Load HTML in preview if exists
+  const btn = document.getElementById('previewLoad');
+  if(btn) btn.click();
 });
 
 // Open in new window
-openInNew.addEventListener('click', ()=>{
-  if(!current) return;
+openNew.addEventListener('click', ()=>{
+  if(!current) return alert('Select a file first.');
   if(['html','htm'].includes(ext(current.path))){
     current.file.arrayBuffer().then(buf=>{
       const blob = new Blob([buf], {type:'text/html'});
@@ -512,38 +281,21 @@ openInNew.addEventListener('click', ()=>{
   }
 });
 
-// Load button: if current is HTML, load into iframe (same as live load)
-loadBtn.addEventListener('click', async ()=>{
-  if(!current) return;
-  if(['html','htm'].includes(ext(current.path))){
-    const text = await current.file.text();
-    const blob = new Blob([text],{type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    viewArea.innerHTML = `<div class="iframe-wrap"><iframe src="${url}" sandbox="allow-same-origin allow-scripts allow-forms"></iframe></div>`;
-  } else {
-    alert('Load currently focuses on HTML live view. Select an HTML file to load.');
-  }
+// Fullscreen preview
+fullBtn.addEventListener('click', ()=>{
+  if(!document.fullscreenElement) view.requestFullscreen?.(); else document.exitFullscreen?.();
 });
 
-// Fullscreen
-fullScreenBtn.addEventListener('click', ()=>{
-  const el = viewArea;
-  if(!document.fullscreenElement){
-    el.requestFullscreen?.();
-  } else {
-    document.exitFullscreen?.();
+// theme toggle (simple)
+toggleTheme.addEventListener('click', ()=> document.body.classList.toggle('dark'));
+
+// small keyboard helper: Enter loads HTML when file selected
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' && current && ['html','htm'].includes(ext(current.path))){
+    const btn = document.getElementById('previewLoad');
+    if(btn) btn.click();
   }
 });
-
-// Minimal initialization: try to set accent from system or meta theme-color
-(function init(){
-  // try reading meta[name="theme-color"]
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta && meta.content) setAccent(meta.content);
-  // default accent from CSS var (already set)
-  // try to detect preferred accent via matchMedia for accent-color not available — skip.
-})();
-
 </script>
 </body>
 </html>
